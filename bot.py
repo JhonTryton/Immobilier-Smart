@@ -1,8 +1,8 @@
-
 # 1) Installer les dépendances (si dans Google Colab)
 #!pip install python-telegram-bot pymongo dnspython nest_asyncio openai --quiet
 
 # 2) Imports
+import threading
 import os, nest_asyncio, openai
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -241,3 +241,20 @@ threading.Thread(target=run_flask).start()
 
 # Démarrer le bot
 app.run_polling()
+
+
+# Lance ton bot Telegram
+def start_bot():
+    application = ApplicationBuilder().token(os.getenv("TELEGRAM_TOKEN")).build()
+    # Ajoute tes handlers ici...
+    application.run_polling()
+
+# Lance le serveur Flask
+def start_webserver():
+    import webserver
+
+# Exécuter les deux en parallèle
+if __name__ == "__main__":
+    threading.Thread(target=start_bot).start()
+    start_webserver()
+        
