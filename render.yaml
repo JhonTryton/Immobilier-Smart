@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: smartimmobot
+    env: python
+    buildCommand: ""
+    startCommand: python bot.py
+    plan: free
+    autoDeploy: true
+    
