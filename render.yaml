@@ -1,8 +1,8 @@
+buildCommand: pip install -r requirements.txt
 services:
-  - type: web
+  - type: worker
     name: Immobilier-Smart
-    runtime: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
+    env: python
     startCommand: python bot.py
+    plan: free
     autoDeploy: true
