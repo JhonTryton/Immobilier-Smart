@@ -10,6 +10,7 @@ from telegram.ext import (
     MessageHandler, filters, ContextTypes, Application
 )
 from pymongo import MongoClient
+from flask import Flask
 
 TOKEN="8071092386:AAFEIopsYTKCzifcQ5pIGfPcyDNP5aC2WVY"
 
@@ -224,37 +225,15 @@ if __name__ == '__main__':
     asyncio.run(app.shutdown()) # Ensure the bot is shut down properly
 
 #Ajouter un webhook ( port render)
-import threading
-from flask import Flask
 
-app_flask = Flask(__name__)
+app = Flask(__name__)
 
-@app_flask.route('/')
+@app.route('/')
 def home():
-    return "SmartImmoBot fonctionne !"
+    return "Hello, Render!"
 
-def run_flask():
-    app_flask.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
-
-# Lancer Flask en parallèle
-threading.Thread(target=run_flask).start()
-
-# Démarrer le bot
-app.run_polling()
-
-
-# Lance ton bot Telegram
-def start_bot():
-    application = ApplicationBuilder().token(os.getenv("TELEGRAM_TOKEN")).build()
-    # Ajoute tes handlers ici...
-    application.run_polling()
-
-# Lance le serveur Flask
-def start_webserver():
-    import webserver
-
-# Exécuter les deux en parallèle
 if __name__ == "__main__":
-    threading.Thread(target=start_bot).start()
-    start_webserver()
-        
+    # Définir un port manuellement ou à partir de la variable d'environnement
+    port = int(os.environ.get('PORT', 8080))  # Définit 8080 comme port par défaut si la variable n'existe pas
+    app.run(host="0.0.0.0", port=port)
+    
