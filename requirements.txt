@@ -4,3 +4,4 @@ dnspython
 nest_asyncio
 requests
 openai 
+Flask
