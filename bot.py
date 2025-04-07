@@ -1,6 +1,6 @@
 
 # 1) Installer les dépendances (si dans Google Colab)
-!pip install python-telegram-bot pymongo dnspython nest_asyncio openai --quiet
+#!pip install python-telegram-bot pymongo dnspython nest_asyncio openai --quiet
 
 # 2) Imports
 import os, nest_asyncio, openai
