@@ -1,6 +1,7 @@
+buildCommand: pip install -r requirements.txt
 services:
   - type: web
-    name: smartimmobot
+    name: Immobilier-Smart
     env: python
     buildCommand: ""
     startCommand: python bot.py
