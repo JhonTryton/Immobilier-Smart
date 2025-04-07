@@ -6,3 +6,5 @@ services:
     env: python
     plan: free
     autoDeploy: true
+ports:
+      - "8080"  # Port spécifique que vous souhaitez utiliser
