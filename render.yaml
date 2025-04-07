@@ -1,6 +1,6 @@
 buildCommand: pip install -r requirements.txt
 services:
-  - type: worker
+  - type: background
     name: Immobilier-Smart
     env: python
     startCommand: python bot.py
