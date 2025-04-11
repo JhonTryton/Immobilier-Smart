@@ -1,5 +1,5 @@
 # 1) Installer les dépendances (si dans Google Colab)
-pip install python-dotenv
+#pip install python-dotenv
 !pip install python-telegram-bot pymongo dnspython nest_asyncio openai flask --quiet
 
 # 2) Imports
