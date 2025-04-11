@@ -5,4 +5,4 @@ nest_asyncio
 requests
 openai 
 Flask
-dotenv
+python-dotenv==1.0.1
