@@ -1,8 +1,16 @@
-buildCommand: pip install -r requirements.txt
-startCommand: python bot.py
 services:
-  - type: web
-    name: Immobilier-Smart
-    env: python
+  - type: worker
+    name: immobilier-Smart
+    runtime: python
+    repo: https://github.com/ton-utilisateur/ton-repo.git  # ← à remplacer par ton vrai repo
+    branch: main
     plan: free
-    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: OPENROUTER_KEY
+        sync: false
