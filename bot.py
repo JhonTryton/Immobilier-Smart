@@ -230,13 +230,23 @@ if __name__ == '__main__':
 # Ajouter un webhook (port render)
 
 # === Partie BOT ===
-async def start(update, context):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot actif !")
 
 def lancer_bot():
-    app_bot = ApplicationBuilder().token(os.environ["BOT_TOKEN"]).build()
+    BOT_TOKEN = os.environ["BOT_TOKEN"]
+    RENDER_HOSTNAME = os.environ["RENDER_EXTERNAL_HOSTNAME"]  # Injecté par Render
+    PORT = int(os.environ.get("PORT", 8443))  # Render utilise généralement ce port pour les webhooks
+
+    app_bot = ApplicationBuilder().token(BOT_TOKEN).build()
     app_bot.add_handler(CommandHandler("start", start))
-    app_bot.run_polling()
+
+    # Configurer le webhook
+    app_bot.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=f"https://{RENDER_HOSTNAME}/{BOT_TOKEN}"  # Webhook URL avec le token
+    )
 
 # === Partie SERVEUR HTTP Flask ===
 app = Flask(__name__)
@@ -250,6 +260,6 @@ if __name__ == "__main__":
     thread = threading.Thread(target=lancer_bot)
     thread.start()
 
-    # Récupérer le port Render ou un port par défaut
+    # Lancer Flask pour écouter les requêtes webhook
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
