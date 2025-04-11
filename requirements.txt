@@ -1,8 +1,8 @@
-python-telegram-bot==20.6
+python-telegram-bot
 pymongo
 dnspython
 nest_asyncio
 requests
 openai 
 Flask
-python-dotenv==1.0.1
+python-dotenv
