@@ -5,3 +5,4 @@ nest_asyncio
 requests
 openai 
 Flask
+dotenv
