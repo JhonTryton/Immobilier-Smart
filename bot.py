@@ -1,5 +1,6 @@
 # 1) Installer les dépendances (si dans Google Colab)
-#!pip install python-telegram-bot pymongo dnspython nest_asyncio openai --quiet
+!pip install python-dotenv
+!pip install python-telegram-bot pymongo dnspython nest_asyncio openai flask --quiet
 
 # 2) Imports
 import threading
@@ -11,23 +12,26 @@ from telegram.ext import (
 )
 from pymongo import MongoClient
 from flask import Flask
+from dotenv import load_dotenv
 
-TOKEN="8071092386:AAFEIopsYTKCzifcQ5pIGfPcyDNP5aC2WVY"
 
 # 3) Exécution asynchrone (Colab)
-nest_asyncio.apply() 
+nest_asyncio.apply()
 
 # 4) Clés d'API
-TOKEN = os.getenv("BOT_TOKEN", "8071092386:AAFEIopsYTKCzifcQ5pIGfPcyDNP5aC2WVY")
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://jhonskyload:9RQEDyKAKPeqYaF1@cluster0.tabu1ts.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-OPENROUTER_KEY = os.getenv("OPENROUTER_KEY", "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")
+# Charger le fichier .env
+load_dotenv()
+
+# Récupérer les variables d'environnement
+TOKEN = os.getenv("BOT_TOKEN")
+MONGO_URI = os.getenv("MONGO_URI")
+OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")
 
 # 5) Connexion MongoDB
 client = MongoClient(MONGO_URI)
 db = client.smartimmobot
 users = db.users
 conversations = db.conversations
-
 
 # 6) Menu principal
 def main_menu():
@@ -55,7 +59,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = f"Bienvenue *{user.first_name}* sur *SmartImmoBot* !\nChoisissez une option :"
     await update.message.reply_text(text, parse_mode='Markdown', reply_markup=main_menu())
 
-
 # 8) Gestion du menu principal
 async def handle_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -74,7 +77,7 @@ async def handle_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await query.edit_message_text(text, parse_mode='Markdown', reply_markup=back_button())
 
-    elif choice in ('annonces','demande'):
+    elif choice in ('annonces', 'demande'):
         await query.edit_message_text(
             "Choisissez :",
             reply_markup=InlineKeyboardMarkup([
@@ -201,7 +204,7 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("mon_profil", mon_profil))
 app.add_handler(CommandHandler("stats", stats))
-app.add_handler(CallbackQueryHandler(handle_main_menu, pattern='^(aide|annonces|demande|rdv|conseils|dons|ia|start)$')) # Fixed: pattern string is now on a single line
+app.add_handler(CallbackQueryHandler(handle_main_menu, pattern='^(aide|annonces|demande|rdv|conseils|dons|ia|start)$'))  # Fixed: pattern string is now on a single line
 app.add_handler(CallbackQueryHandler(handle_subcommands))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_ai_message))
 
@@ -209,22 +212,22 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_ai_messag
 # Instead of directly calling run_polling(), use this:
 import asyncio
 async def run_bot():
-  """Starts the bot and keeps it running."""
-  await app.initialize() # Initialize the bot before starting
-  # Use app.run_polling() instead of app.start_polling()
-  await app.run_polling() # Start polling for updates
-  # await app.idle() # Keep the bot running until it's stopped - This line might cause issues, so I have commented it out. If you want to use run_polling() you don't need to call app.idle()
+    """Starts the bot and keeps it running."""
+    await app.initialize()  # Initialize the bot before starting
+    # Use app.run_polling() instead of app.start_polling()
+    await app.run_polling()  # Start polling for updates
+    # await app.idle() # Keep the bot running until it's stopped - This line might cause issues, so I have commented it out. If you want to use run_polling() you don't need to call app.idle()
 
 # Only execute this if the script is run directly (not imported)
 if __name__ == '__main__':
-  try:
-    asyncio.run(run_bot()) # Run the bot in an event loop
-  except KeyboardInterrupt: # Allow graceful shutdown with Ctrl+C
-    print("Bot stopped by user.")
-  finally:
-    asyncio.run(app.shutdown()) # Ensure the bot is shut down properly
+    try:
+        asyncio.run(run_bot())  # Run the bot in an event loop
+    except KeyboardInterrupt:  # Allow graceful shutdown with Ctrl+C
+        print("Bot stopped by user.")
+    finally:
+        asyncio.run(app.shutdown())  # Ensure the bot is shut down properly
 
-#Ajouter un webhook ( port render)
+# Ajouter un webhook (port render)
 
 # === Partie BOT ===
 async def start(update, context):
