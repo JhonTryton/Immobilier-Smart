@@ -26,6 +26,8 @@ load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 MONGO_URI = os.getenv("MONGO_URI")
 OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")
+WEBHOOK_PATH = f"/webhook/{WEBHOOK_SECRET}"
+WEBHOOK_URL = f"https://{RENDER_EXTERNAL_HOSTNAME}{WEBHOOK_PATH}"
 
 # 5) Connexion MongoDB
 client = MongoClient(MONGO_URI)
