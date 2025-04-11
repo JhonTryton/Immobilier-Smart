@@ -229,37 +229,39 @@ if __name__ == '__main__':
 
 # Ajouter un webhook (port render)
 
+
 # === Partie BOT ===
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot actif !")
+    await update.message.reply_text("🤖 Bot actif via webhook !")
 
-def lancer_bot():
-    BOT_TOKEN = os.environ["BOT_TOKEN"]
-    RENDER_HOSTNAME = os.environ["RENDER_EXTERNAL_HOSTNAME"]  # Injecté par Render
-    PORT = int(os.environ.get("PORT", 8443))  # Render utilise généralement ce port pour les webhooks
-
-    app_bot = ApplicationBuilder().token(BOT_TOKEN).build()
-    app_bot.add_handler(CommandHandler("start", start))
-
-    # Configurer le webhook
-    app_bot.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=f"https://{RENDER_HOSTNAME}/{BOT_TOKEN}"  # Webhook URL avec le token
-    )
-
-# === Partie SERVEUR HTTP Flask ===
+# === Création de l’application Flask et du bot ===
 app = Flask(__name__)
+BOT_TOKEN = os.environ["BOT_TOKEN"]
+WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "secret123")  # à définir dans .env
+WEBHOOK_PATH = f"/webhook/{WEBHOOK_SECRET}"
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+WEBHOOK_URL = f"https://{RENDER_EXTERNAL_HOSTNAME}{WEBHOOK_PATH}"
+
+application = ApplicationBuilder().token(BOT_TOKEN).build()
+application.add_handler(CommandHandler("start", start))
 
 @app.route("/")
 def index():
-    return "Bot en ligne ! Port OK."
+    return "✅ Bot en ligne !"
+
+@app.post(WEBHOOK_PATH)
+async def webhook_handler():
+    update = Update.de_json(request.get_json(force=True), application.bot)
+    await application.process_update(update)
+    return "OK"
+
+@app.before_first_request
+async def setup_webhook():
+    await application.bot.set_webhook(url=WEBHOOK_URL)
+    print(f"✅ Webhook configuré sur : {WEBHOOK_URL}")
 
 if __name__ == "__main__":
-    # Lancer le bot dans un thread parallèle
-    thread = threading.Thread(target=lancer_bot)
-    thread.start()
-
-    # Lancer Flask pour écouter les requêtes webhook
+    import asyncio
+    asyncio.run(setup_webhook())  # configure le webhook au démarrage
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
